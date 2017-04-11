@@ -19,6 +19,7 @@ typedef reservation {
  
  bool taskTerminated = false;
  
+ bool p4boolean = false; //not violated initially
  
 
 /* Capability strategy */
@@ -251,6 +252,12 @@ proctype Capability(task capabilitytask; int i) {
 		capabilityOutput[i] ! message;
 		capabilitiesState.output[i] = 1;
 
+		if 
+			::((capabilitiesState.output[i] == 1)&& (capabilitiesState.start[i] == 0)) -> 
+				p4boolean = true;			
+				printf("~* p2 violated! *~\n");
+		fi;
+		
 		message.messageType = c_done;
 		capabilityComplete[i] ! message;
 		capabilitiesState.complete[i] = 1;
@@ -276,4 +283,8 @@ ltl p2 { [](p2boolean == false) }
 
 ltl p3 { []((task_cancel == 1 ) -> <> (taskTerminated==true)) }
 
-
+ltl p4 { [](p4boolean == false) }
+ /* 
+ Capability output message is never sent before the Start Capability message.
+ This property is significant for the system due to the clients can not expect any output message of the Capability before they get the message about the start of the Capability. 
+ */
