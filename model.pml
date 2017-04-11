@@ -102,7 +102,7 @@ proctype Client() {
 				printf("~* Task %d is ready *~\n", readyTask.id);
 
 				if 
-					::((helloIsSent == 1)&& (readyIsSent== 0)) -> 
+					::((helloIsSent == true)&& (readyIsSent== false)) -> 
 					p0boolean = true;			
 					printf("~* p2 violated! *~\n");
 					:: skip;
@@ -111,7 +111,7 @@ proctype Client() {
        			readyIsSent = true;
 
 				if 
-					::((helloIsSent == 1)&& (readyIsSent== 0)) -> 
+					::((helloIsSent == true)&& (readyIsSent== false)) -> 
 					p0boolean = true;			
 					printf("~* p2 violated! *~\n");
 					:: skip;
@@ -130,7 +130,7 @@ proctype Client() {
 							printf("~* Client %d was heloed by capability %d *~\n", _pid, message.capabilityId);
 
 							if 
-								::((helloIsSent == 1)&& (readyIsSent== 0)) -> 
+								::((helloIsSent == true)&& (readyIsSent== false)) -> 
 								p0boolean = true;			
 								printf("~* p2 violated! *~\n");
 								:: skip;
@@ -139,7 +139,7 @@ proctype Client() {
 
 
 							if 
-								::((helloIsSent == 1)&& (readyIsSent== 0)) -> 
+								::((helloIsSent == true)&& (readyIsSent== false)) -> 
 								p0boolean = true;			
 								printf("~* p2 violated! *~\n");
 								:: skip;
