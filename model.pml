@@ -14,7 +14,9 @@ typedef reservation {
  int readyIsSent = 0;
 
  int helloIsSent = 0;
-
+ 
+ bool p2boolean = false; //not violated initially
+ 
 
 /* Capability strategy */
 mtype = {sequence, concurrent};
@@ -131,7 +133,7 @@ proctype Client() {
 						outMessage.messageType == c_out && outMessage.taskId == _pid;
 						capabilitiesState.output[message.capabilityId] == 1;
 						printf("Сapability %d sent output message to the client %d!\n", outMessage.capabilityId, _pid);
-
+						
 						capabilityComplete[startMsg.capabilityId] ? outMessage;
 						outMessage.messageType == c_done && outMessage.taskId == _pid;
 						capabilitiesState.complete[message.capabilityId] == 1;
@@ -236,7 +238,7 @@ proctype Capability(task capabilitytask; int i) {
 		capabilityInput[i] ? inputMessage;
 		inputMessage.messageType == c_in && inputMessage.taskId == capabilitytask.id;
 		capabilitiesState.input[i] == 1;
-
+		
 		message.messageType = c_out;
 		message.taskId == capabilitytask.id;
 		capabilityOutput[i] ! message;
@@ -245,6 +247,12 @@ proctype Capability(task capabilitytask; int i) {
 		message.messageType = c_done;
 		capabilityComplete[i] ! message;
 		capabilitiesState.complete[i] = 1;
+		
+		if 
+			::((capabilitiesState.complete[i] == 1)&& (capabilitiesState.output[i] == 0)) -> 
+				p2boolean = true;			
+				printf("~* p2 violated! *~\n");
+		fi;
 
 }
 
@@ -257,5 +265,6 @@ init {
 
 
 ltl p0 { ((! ((helloIsSent==1))) U ((readyIsSent==1))) && ((! ((readyIsSent==1))) || (<> ((helloIsSent==1)))) }
+ltl p2 { [](p2boolean == false) }
 
 
