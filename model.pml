@@ -17,6 +17,9 @@ typedef reservation {
  
  bool p2boolean = false; //not violated initially
  
+ bool taskTerminated = false;
+ 
+ 
 
 /* Capability strategy */
 mtype = {sequence, concurrent};
@@ -89,6 +92,7 @@ proctype Client() {
 
 	if 
 		::task_cancel == 0 ->
+				taskTerminated = false;
 				task readyTask;
 				managerClient ? readyTask;
 				printf("~* Ready task %d pid %d *~\n", readyTask.id, _pid);
@@ -152,7 +156,10 @@ proctype Client() {
 	
 		::task_cancel == 1 -> goto end;	
 	fi;
-	end: skip;
+	end: {
+		taskTerminated = true;
+		skip;
+	}
 }
 
 proctype Manager() {
@@ -266,5 +273,7 @@ init {
 
 ltl p0 { ((! ((helloIsSent==1))) U ((readyIsSent==1))) && ((! ((readyIsSent==1))) || (<> ((helloIsSent==1)))) }
 ltl p2 { [](p2boolean == false) }
+
+ltl p3 { []((task_cancel == 1 ) -> <> (taskTerminated==true)) }
 
 
