@@ -15,6 +15,7 @@ typedef reservation {
 
  int helloIsSent = 0;
  
+ bool check = false; //not violated initially
  bool p2boolean = false; //not violated initially
  
  bool taskTerminated = false;
@@ -284,6 +285,7 @@ ltl p2 { [](p2boolean == false) }
 ltl p3 { []((task_cancel == 1 ) -> <> (taskTerminated==true)) }
 
 ltl p4 { [](p4boolean == false) }
+ltl 5 { [](check==false) }
  /* 
  Capability output message is never sent before the Start Capability message.
  This property is significant for the system due to the clients can not expect any output message of the Capability before they get the message about the start of the Capability. 
