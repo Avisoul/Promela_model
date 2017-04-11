@@ -11,9 +11,9 @@ typedef reservation {
 }
 
 
- int readyIsSent;
+ int readyIsSent = 0;
 
- int helloIsSent;
+ int helloIsSent = 0;
 
 
 /* Capability strategy */
@@ -106,6 +106,8 @@ proctype Client() {
 							capabilitiesState.hello[message.capabilityId] == 1;
 							printf("~* Client %d was heloed by capability %d *~\n", _pid, message.capabilityId);
 
+							helloIsSent = 1;
+		
 						/* Send start and input to the capability */
 							capabilityMessage startMsg;
 							startMsg.capabilityId = message.capabilityId;
