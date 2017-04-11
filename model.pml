@@ -11,11 +11,10 @@ typedef reservation {
 }
 
 
- int readyIsSent = 0;
+ bit readyIsSent = false;
 
- int helloIsSent = 0;
+ bit helloIsSent = false;
  
- bool check = false; //not violated initially
  bool p2boolean = false; //not violated initially
  
  bool taskTerminated = false;
@@ -100,7 +99,7 @@ proctype Client() {
 				printf("~* Ready task %d pid %d *~\n", readyTask.id, _pid);
 				readyTask.state == ready && readyTask.id == _pid;
 				printf("~* Task %d is ready *~\n", readyTask.id);
-       			readyIsSent = 1;
+       			readyIsSent = true;
 				
 				int i;
 
@@ -114,7 +113,7 @@ proctype Client() {
 							capabilitiesState.hello[message.capabilityId] == 1;
 							printf("~* Client %d was heloed by capability %d *~\n", _pid, message.capabilityId);
 
-							helloIsSent = 1;
+							helloIsSent = true;
 		
 						/* Send start and input to the capability */
 							capabilityMessage startMsg;
@@ -232,7 +231,6 @@ proctype Capability(task capabilitytask; int i) {
 		capabilityClientHelo ! message;
 		capabilitiesState.hello[i] = 1;
 	
-        helloIsSent = 1;
 
 		// heloing the client (whatever it means)
 		printf("~* Capability %d was assigned for task %d *~ \n", i, message.taskId);
@@ -257,6 +255,7 @@ proctype Capability(task capabilitytask; int i) {
 			::((capabilitiesState.output[i] == 1)&& (capabilitiesState.start[i] == 0)) -> 
 				p4boolean = true;			
 				printf("~* p2 violated! *~\n");
+			:: skip;
 		fi;
 		
 		message.messageType = c_done;
@@ -267,6 +266,7 @@ proctype Capability(task capabilitytask; int i) {
 			::((capabilitiesState.complete[i] == 1)&& (capabilitiesState.output[i] == 0)) -> 
 				p2boolean = true;			
 				printf("~* p2 violated! *~\n");
+			:: skip;
 		fi;
 
 }
@@ -279,13 +279,12 @@ init {
 }
 
 
-ltl p0 { ((! ((helloIsSent==1))) U ((readyIsSent==1))) && ((! ((readyIsSent==1))) || (<> ((helloIsSent==1)))) }
+ltl p0 { ((! ((helloIsSent==true))) U ((readyIsSent==true))) && ((! ((readyIsSent==true))) || (<> ((helloIsSent==true)))) }
 ltl p2 { [](p2boolean == false) }
 
 ltl p3 { []((task_cancel == 1 ) -> <> (taskTerminated==true)) }
 
 ltl p4 { [](p4boolean == false) }
-ltl 5 { [](check==false) }
  /* 
  Capability output message is never sent before the Start Capability message.
  This property is significant for the system due to the clients can not expect any output message of the Capability before they get the message about the start of the Capability. 
