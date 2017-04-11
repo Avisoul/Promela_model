@@ -15,6 +15,7 @@ typedef reservation {
 
  bit helloIsSent = false;
  
+ bool p0boolean = false; //not violated initially
  bool p2boolean = false; //not violated initially
  
  bool taskTerminated = false;
@@ -99,7 +100,22 @@ proctype Client() {
 				printf("~* Ready task %d pid %d *~\n", readyTask.id, _pid);
 				readyTask.state == ready && readyTask.id == _pid;
 				printf("~* Task %d is ready *~\n", readyTask.id);
+
+				if 
+					::((helloIsSent == 1)&& (readyIsSent== 0)) -> 
+					p0boolean = true;			
+					printf("~* p2 violated! *~\n");
+					:: skip;
+				fi;
+
        			readyIsSent = true;
+
+				if 
+					::((helloIsSent == 1)&& (readyIsSent== 0)) -> 
+					p0boolean = true;			
+					printf("~* p2 violated! *~\n");
+					:: skip;
+				fi;
 				
 				int i;
 
@@ -113,7 +129,21 @@ proctype Client() {
 							capabilitiesState.hello[message.capabilityId] == 1;
 							printf("~* Client %d was heloed by capability %d *~\n", _pid, message.capabilityId);
 
+							if 
+								::((helloIsSent == 1)&& (readyIsSent== 0)) -> 
+								p0boolean = true;			
+								printf("~* p2 violated! *~\n");
+								:: skip;
+							fi;
 							helloIsSent = true;
+
+
+							if 
+								::((helloIsSent == 1)&& (readyIsSent== 0)) -> 
+								p0boolean = true;			
+								printf("~* p2 violated! *~\n");
+								:: skip;
+							fi;
 		
 						/* Send start and input to the capability */
 							capabilityMessage startMsg;
@@ -279,7 +309,9 @@ init {
 }
 
 
-ltl p0 { ((! ((helloIsSent==true))) U ((readyIsSent==true))) && ((! ((readyIsSent==true))) || (<> ((helloIsSent==true)))) }
+
+ltl p0 { [](p0boolean == false) }
+//ltl p0 { ((! ((helloIsSent==true))) U ((readyIsSent==true))) && ((! ((readyIsSent==true))) || (<> ((helloIsSent==true)))) }
 ltl p2 { [](p2boolean == false) }
 
 ltl p3 { []((task_cancel == 1 ) -> <> (taskTerminated==true)) }
